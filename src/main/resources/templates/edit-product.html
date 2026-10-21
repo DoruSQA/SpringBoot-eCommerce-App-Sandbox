@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Edit Product</title>
+
+```
+<style>
+
+    body{
+        font-family: Arial, sans-serif;
+        background:#f5f5f5;
+        margin:0;
+    }
+
+    .container{
+        width:400px;
+        margin:50px auto;
+        background:white;
+        padding:20px;
+        border-radius:10px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    h2{
+        text-align:center;
+    }
+
+    input{
+        width:100%;
+        padding:10px;
+        margin:10px 0;
+        border:1px solid #ccc;
+        border-radius:5px;
+        box-sizing:border-box;
+    }
+
+    button{
+        width:100%;
+        padding:10px;
+        background:orange;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    }
+
+    button:hover{
+        background:#e68900;
+    }
+
+    .msg{
+        text-align:center;
+        margin-top:15px;
+        font-weight:bold;
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="container">
+
+```
+<h2>Edit Product</h2>
+
+<input
+    type="text"
+    id="name"
+    placeholder="Product Name">
+
+<input
+    type="text"
+    id="category"
+    placeholder="Category">
+
+<input
+    type="number"
+    id="price"
+    placeholder="Price">
+
+<button onclick="updateProduct()">
+    Update Product
+</button>
+
+<div id="msg" class="msg"></div>
+```
+
+</div>
+
+<script>
+
+const productId =
+    window.location.pathname.split("/").pop();
+
+window.onload = function(){
+
+    fetch('/products/' + productId)
+        .then(response => response.json())
+        .then(product => {
+
+            document.getElementById("name").value =
+                product.name;
+
+            document.getElementById("category").value =
+                product.category;
+
+            document.getElementById("price").value =
+                product.price;
+        })
+        .catch(error => {
+
+            document.getElementById("msg").style.color = "red";
+            document.getElementById("msg").innerText =
+                "Could not load product!";
+        });
+};
+
+function updateProduct(){
+
+    const product = {
+
+        name:
+            document.getElementById("name").value,
+
+        category:
+            document.getElementById("category").value,
+
+        price:
+            parseFloat(
+                document.getElementById("price").value
+            )
+    };
+
+    fetch('/products/' + productId, {
+
+        method:'PUT',
+
+        headers:{
+            'Content-Type':'application/json'
+        },
+
+        body:JSON.stringify(product)
+
+    })
+    .then(response => {
+
+        if(!response.ok){
+            throw new Error();
+        }
+
+        return response.json();
+    })
+    .then(data => {
+
+        const msg =
+            document.getElementById("msg");
+
+        msg.style.color = "green";
+        msg.innerText =
+            "Product updated successfully!";
+    })
+    .catch(error => {
+
+        const msg =
+            document.getElementById("msg");
+
+        msg.style.color = "red";
+        msg.innerText =
+            "Update failed!";
+    });
+}
+
+</script>
+
+</body>
+</html>
